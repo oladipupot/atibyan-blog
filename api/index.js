@@ -1,7 +1,8 @@
 
 import express from 'express';
 import mongoose from "mongoose";
-import dotenv from "dotenv"
+import dotenv from "dotenv";
+import userRouter from "./routes/user.routes";
 
 dotenv.config()
 mongoose.connect(process.env.MONGO).then(
@@ -18,5 +19,4 @@ app.listen(3000, () => {
     
 })
 
-// dbusername:oladipupotoheeb75
-// dbpassword: ZFaZT8RWiykZ0ObW
+app.use ('/ap1/user', userRouter)
