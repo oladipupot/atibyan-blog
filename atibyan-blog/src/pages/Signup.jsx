@@ -1,14 +1,17 @@
 "use client";
 
 
-import { Alert, Button, Label, TextInput } from "flowbite-react";
+import { Alert, Button, Label, Spinner, TextInput } from "flowbite-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+
 
 export default function Signup() {
   const [formData, setFormData]= useState({});
   const [errorMessage, setErrorMessage] = useState(null)
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
   const handlechange = (e) => {
    setFormData({...formData, [e.target.id]: e.target.value.trim() })
   };
@@ -19,6 +22,8 @@ export default function Signup() {
       return setErrorMessage('please fill out all fields.')
     }
     try{
+      setLoading(true);
+      setErrorMessage(null);
       const res = await fetch ('/api/auth/signup', {
         method: 'POST', 
         headers: { 'Content-Type': 'application/json' },
@@ -27,10 +32,16 @@ export default function Signup() {
       
       const data = await res.json();
       if (data.success == false){
-        return setErrorMessage (data.message);
+        return setErrorMessage ('user or email already exits');
       }
+      setLoading(false);
+      if (res.ok){
+        navigate ('/signin')
+      }
+
     } catch (error){
-      console.error("Error during signup:", error);
+      setErrorMessage(error.message);
+      setLoading(false);
     }
   }
     
@@ -66,7 +77,17 @@ export default function Signup() {
               <Label htmlFor="username" value="Enter Password" />
               <TextInput type="password" placeholder="password" id="password" onChange={handlechange} />
             </div>
-            <Button gradientDuoTone='purpleToPink'  type="submit">Sign Up</Button>
+            <Button gradientDuoTone='purpleToPink'  type="submit" disabled= {loading}>
+              {
+                loading ? (
+                  <>
+                    <Spinner size="sm" />
+                    <span className="pl-3">loading...</span>
+                  </>
+                )
+              
+              
+             : 'Sign Up'}</Button>
           </form>
 
           <div className="mt-5">
